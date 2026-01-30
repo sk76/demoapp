@@ -1,0 +1,18 @@
+<html>
+<body>
+  <h2>CI/CD Demo – Version 1</h2>
+  <button onclick="load()">Load Users</button>
+  <ul id="list"></ul>
+
+<script>
+function load() {
+  fetch('/api/users')
+    .then(r => r.json())
+    .then(d => {
+      list.innerHTML = d.map(u => `<li>${u.name}</li>`).join('');
+    });
+}
+</script>
+</body>
+</html>
+
