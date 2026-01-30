@@ -1,0 +1,36 @@
+<html>
+<body>
+  <h2>Verified App NEW VERSION-4 on 30th JAN – CI/CD</h2>
+
+  <input id="n" placeholder="name">
+  <input id="e" placeholder="email">
+
+  <button onclick="add()">Add User</button>
+  <button onclick="load()">Show Users</button>
+
+  <ul id="l"></ul>
+
+<script>
+function add() {
+  fetch('/api/users', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({
+      name: n.value,
+      email: e.value
+    })
+  }).then(() => alert('User Added'));
+}
+
+function load() {
+  fetch('/api/users')
+    .then(r => r.json())
+    .then(d => {
+      document.getElementById('l').innerHTML =
+        d.map(u => `<li>${u.name}</li>`).join('');
+    });
+}
+</script>
+
+</body>
+</html>
