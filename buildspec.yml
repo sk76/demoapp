@@ -1,0 +1,41 @@
+version: 0.2
+
+phases:
+  install:
+    commands:
+      - echo "Install phase started"
+
+  build:
+    commands:
+      - echo "Packaging backend & frontend"
+      - tar -czf backend.tar.gz backend
+      - tar -czf frontend.tar.gz frontend
+
+      - echo "Uploading artifacts to S3"
+      - aws s3 cp backend.tar.gz s3://$ARTIFACT_BUCKET/
+      - aws s3 cp frontend.tar.gz s3://$ARTIFACT_BUCKET/
+
+      - echo "Deploying Backend via SSM"
+      - |
+        aws ssm send-command \
+          --targets "Key=tag:Name,Values=backend-ec2" \
+          --document-name "AWS-RunShellScript" \
+          --parameters 'commands=[
+            "cd /var/www/demoapp",
+            "aws s3 cp s3://'$ARTIFACT_BUCKET'/backend.tar.gz .",
+            "tar -xzf backend.tar.gz",
+            "cd backend",
+            "npm install",
+            "systemctl restart demoapp"
+          ]'
+
+      - echo "Deploying Frontend via SSM"
+      - |
+        aws ssm send-command \
+          --targets "Key=tag:Name,Values=frontend-ec2" \
+          --document-name "AWS-RunShellScript" \
+          --parameters 'commands=[
+            "aws s3 cp s3://'$ARTIFACT_BUCKET'/frontend.tar.gz /tmp/",
+            "tar -xzf /tmp/frontend.tar.gz -C /usr/share/nginx/html --strip-components=1",
+            "systemctl reload nginx"
+          ]'

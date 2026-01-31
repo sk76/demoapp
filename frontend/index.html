@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<body>
+  <h2>CI/CD Verified App-V1</h2>
+
+  <input id="name" placeholder="Name">
+  <button onclick="add()">Add</button>
+  <button onclick="load()">Load</button>
+
+  <ul id="list"></ul>
+
+<script>
+function add() {
+  fetch('/api/users', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({ name: document.getElementById('name').value })
+  });
+}
+
+function load() {
+  fetch('/api/users')
+    .then(r => r.json())
+    .then(d => {
+      document.getElementById('list').innerHTML =
+        d.map(u => `<li>${u.name}</li>`).join('');
+    });
+}
+</script>
+</body>
+</html>
+
