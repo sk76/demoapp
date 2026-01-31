@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Verified CICD Demo-V1 31st JAN</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f6f8;
+      padding: 40px;
+    }
+    h2 {
+      color: #2c3e50;
+    }
+    input {
+      margin: 5px;
+      padding: 8px;
+    }
+    button {
+      padding: 8px 12px;
+      margin: 5px;
+      cursor: pointer;
+    }
+    ul {
+      margin-top: 20px;
+    }
+  </style>
+</head>
+
+<body>
+
+<h2>🚀 CICD Verified App (V3)</h2>
+
+<input id="name" placeholder="Name">
+<input id="email" placeholder="Email">
+
+<br>
+
+<button onclick="addUser()">Add User</button>
+<button onclick="loadUsers()">Load Users</button>
+
+<ul id="users"></ul>
+
+<script>
+function addUser() {
+  fetch("/api/users", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      name: document.getElementById("name").value,
+      email: document.getElementById("email").value
+    })
+  })
+  .then(res => res.json())
+  .then(() => {
+    alert("User added");
+    loadUsers();
+  });
+}
+
+function loadUsers() {
+  fetch("/api/users")
+    .then(res => res.json())
+    .then(data => {
+      document.getElementById("users").innerHTML =
+        data.map(u => `<li>${u.name} (${u.email})</li>`).join("");
+    });
+}
+</script>
+
+</body>
+</html>
