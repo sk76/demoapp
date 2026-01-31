@@ -17,16 +17,15 @@ phases:
 
       - echo "Deploying Backend via SSM"
       - |
+        - echo "Deploy frontend via SSM"
+      - |
         aws ssm send-command \
-          --targets "Key=tag:Name,Values=backend-ec2" \
+          --targets "Key=tag:Name,Values=frontend-ec2" \
           --document-name "AWS-RunShellScript" \
           --parameters 'commands=[
-            "cd /var/www/demoapp",
-            "aws s3 cp s3://'$ARTIFACT_BUCKET'/backend.tar.gz .",
-            "tar -xzf backend.tar.gz",
-            "cd backend",
-            "npm install",
-            "systemctl restart demoapp"
+            "sudo aws s3 cp s3://'$ARTIFACT_BUCKET'/frontend.tar.gz /tmp/frontend.tar.gz",
+            "sudo tar -xzf /tmp/frontend.tar.gz -C /usr/share/nginx/html --strip-components=1",
+            "sudo systemctl reload nginx"
           ]'
 
       - echo "Deploying Frontend via SSM"
