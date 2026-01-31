@@ -17,15 +17,15 @@ phases:
 
       - echo "Deploying Backend via SSM"
       - |
-        - echo "Deploy frontend via SSM"
-      - |
         aws ssm send-command \
-          --targets "Key=tag:Name,Values=frontend-ec2" \
+          --targets "Key=tag:Name,Values=backend-ec2" \
           --document-name "AWS-RunShellScript" \
           --parameters 'commands=[
-            "sudo aws s3 cp s3://'$ARTIFACT_BUCKET'/frontend.tar.gz /tmp/frontend.tar.gz",
-            "sudo tar -xzf /tmp/frontend.tar.gz -C /usr/share/nginx/html --strip-components=1",
-            "sudo systemctl reload nginx"
+            "sudo aws s3 cp s3://'$ARTIFACT_BUCKET'/backend.tar.gz /tmp/backend.tar.gz",
+            "sudo tar -xzf /tmp/backend.tar.gz -C /var/www/demoapp",
+            "cd /var/www/demoapp/backend",
+            "sudo npm install",
+            "sudo systemctl restart demoapp"
           ]'
 
       - echo "Deploying Frontend via SSM"
@@ -34,7 +34,7 @@ phases:
           --targets "Key=tag:Name,Values=frontend-ec2" \
           --document-name "AWS-RunShellScript" \
           --parameters 'commands=[
-            "aws s3 cp s3://'$ARTIFACT_BUCKET'/frontend.tar.gz /tmp/",
-            "tar -xzf /tmp/frontend.tar.gz -C /usr/share/nginx/html --strip-components=1",
-            "systemctl reload nginx"
+            "sudo aws s3 cp s3://'$ARTIFACT_BUCKET'/frontend.tar.gz /tmp/frontend.tar.gz",
+            "sudo tar -xzf /tmp/frontend.tar.gz -C /usr/share/nginx/html --strip-components=1",
+            "sudo systemctl reload nginx"
           ]'
